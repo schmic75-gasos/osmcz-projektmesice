@@ -1,0 +1,109 @@
+{
+  "chat_messages": [
+    {
+      "user": "turistka123",
+      "text": "Dokončila jsem mapování turistických rozcestníků v Krkonoších.",
+      "timestamp": "2025-12-31T22:08:59.008730"
+    },
+    {
+      "user": "turistka123",
+      "text": "Dokončila jsem mapování turistických rozcestníků v Krkonoších.",
+      "timestamp": "2025-12-31T22:11:12.000605"
+    },
+    {
+      "user": "mapomat",
+      "text": "Právě jsem zmapoval 5 nových cyklostezek v Praze!",
+      "timestamp": "2025-12-31T22:16:41.985738"
+    },
+    {
+      "user": "Thisík",
+      "text": "Testovací zpráva",
+      "timestamp": "2025-12-31T22:20:08.569725"
+    },
+    {
+      "user": "MoudrýEditátor36",
+      "text": "Funguje?",
+      "timestamp": "2025-12-31T22:20:24.803822"
+    },
+    {
+      "user": "Thisík",
+      "text": "JJ",
+      "timestamp": "2025-12-31T22:20:32.631943"
+    },
+    {
+      "user": "Thisík",
+      "text": ":)",
+      "timestamp": "2025-12-31T22:24:30.429998"
+    },
+    {
+      "user": "RychlýEditátor11",
+      "text": "😉",
+      "timestamp": "2025-12-31T22:24:48.405515"
+    },
+    {
+      "user": "Ondřej Lopatka",
+      "text": "Zaprvé, tohle by se dalo napojit na náš OSM chat? Ale jestli to chcete nechat pro projekt měsíce tak asi jo.",
+      "timestamp": "2026-01-01T08:31:48.305618"
+    },
+    {
+      "user": "Ondřej Lopatka",
+      "text": "Zadruhé, ta village_green by podle mě šla docela dobře přemapovat pomocí nějakého hromadného editu z overpass hledání",
+      "timestamp": "2026-01-01T08:33:14.149370"
+    },
+    {
+      "user": "Ondřej Lopatka",
+      "text": "Ale určitě by to bylo vhodné, protože já jsem mapoval okolní zeleň právě jako village green, protože jsem tagy opisoval, místo abych četl wiki",
+      "timestamp": "2026-01-01T08:34:12.362743"
+    },
+    {
+      "user": "Thisík",
+      "text": "Přesně, ta village_green by šla krásně přes overpass a JOSM",
+      "timestamp": "2026-01-01T10:13:46.617609"
+    },
+    {
+      "user": "Thisík",
+      "text": "Napojit na OSM chat by to možná šlo, ale zatím bych to asi nechal takto, jestli souhlasíte.",
+      "timestamp": "2026-01-01T10:14:08.492441"
+    }
+  ],
+  "project_ideas": [
+    {
+      "id": 1767216366889,
+      "title": "Zařazování zastávek a stanic správně do IDSa opravovat staré tagy.",
+      "description": "Zařazování zastávek a stanic správně do IDS příslušných krajů a opravovat zastaralé/chybné tagy, kde chybí bus=yes a podobně. +mapování nových terminálu, který je teď docela dost.",
+      "author": "Thisík",
+      "votes": 1,
+      "created_at": "2025-12-31T22:26:06.889908",
+      "winning": false
+    },
+    {
+      "id": 1767218003305,
+      "title": "village_green není veřejná zeleň",
+      "description": "village_green je zatravněná náves v anglických vesnicích, ne veřejná zeleň. Pro tu je na místě tráva, křoví apod.",
+      "author": "PilnýKartograf65",
+      "votes": 1,
+      "created_at": "2025-12-31T22:53:23.305822",
+      "winning": false
+    },
+    {
+      "id": 1767218173150,
+      "title": "Uzavření starých poznámek",
+      "description": "V mapě jsou mnoho let staré poznámky, kterým se nikdo nevěnuje.",
+      "author": "PřesnýObjevitel0",
+      "votes": 2,
+      "created_at": "2025-12-31T22:56:13.150691",
+      "winning": false
+    }
+  ],
+  "user_votes": {
+    "user_sl4oamv6b_mjuit45o": [
+      "1767216366889",
+      "1767218173150"
+    ],
+    "user_p9q73k9li_mjujrctg": [
+      1767218003305,
+      1767218173150
+    ]
+  },
+  "last_updated": "2026-01-01T11:08:38.069187"
+}

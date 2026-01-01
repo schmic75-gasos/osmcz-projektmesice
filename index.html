@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projekt měsíce - Česká OSM komunita</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>">
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-map-marked-alt"></i>
+                <div>
+                    <h1>Projekt měsíce</h1>
+                    <span class="subtitle">Česká OpenStreetMap komunita</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#anketa" class="nav-link active">Anketa</a></li>
+                    <li><a href="#statistiky" class="nav-link">Statistiky</a></li>
+                    <li><a href="#chat" class="nav-link">Chat</a></li>
+                    <li><a href="#info" class="nav-link">Informace</a></li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="current-project" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-calendar-star"></i> Aktuální hlasování</h2>
+                <div class="period-info">
+                    <span class="period-badge">Hlasování končí: 5.1.2026 23:59</span>
+                    <span class="period-badge">Projekt: 6.1.2026 - 6.2.2026</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="project-info">
+                    <div class="no-project">
+                        <i class="fas fa-vote-yea"></i>
+                        <h3>Právě probíhá hlasování o projektu na leden 2026</h3>
+                        <p>Hlasujte pro nápad, co bychom měli společně mapovat v období od 6.1.2026 do 6.2.2026.</p>
+                        <p>Vítězný projekt bude vyhlášen 6.1.2026 v 00:00.</p>
+                    </div>
+                    <div class="disclaimer">
+                        <i class="fas fa-info-circle"></i>
+                        <p><strong>Upozornění:</strong> Projekt měsíce není rozkaz, ale komunitní cíl a doporučení. 
+                        Zapojte se do mapování podle svých možností a preferencí.</p>
+                    </div>
+                    <div class="changeset-tag">
+                        <h4><i class="fas fa-tag"></i> Povinný tag pro changeset:</h4>
+                        <code>#projektmesice</code>
+                        <p class="tag-info">Při mapování v rámci vybraného projektu přidejte tento tag k vašim changesetům.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="two-column-layout">
+            <div class="column">
+                <section id="anketa" class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-vote-yea"></i> Hlasování - Co budeme mapovat v lednu 2026?</h2>
+                        <div class="remaining-votes">Zbývající hlasy: <span id="remainingVotes">2</span></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="add-idea-form">
+                            <h3><i class="fas fa-lightbulb"></i> Přidat nový nápad</h3>
+                            <div class="form-group">
+                                <input type="text" id="ideaTitle" placeholder="Název projektu (např. Mapování laviček a odpadkových košů)">
+                            </div>
+                            <div class="form-group">
+                                <textarea id="ideaDescription" rows="3" placeholder="Popis projektu..."></textarea>
+                            </div>
+                            <button id="addIdeaBtn" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i> Přidat nápad
+                            </button>
+                        </div>
+                        
+                        <div class="ideas-list">
+                            <h3>Nápady na leden 2026</h3>
+                            <div id="ideasContainer">
+                                <!-- Nápady budou načteny pomocí JavaScriptu -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="statistiky" class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-bar"></i> Statistiky #projektmesice</h2>
+                        <div class="last-update">Aktualizováno: <span id="lastUpdate">právě teď</span></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalChangesets">0</div>
+                                <div class="stat-label">Celkem changesetů</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalContributors">0</div>
+                                <div class="stat-label">Přispěvatelů</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="changesetsToday">0</div>
+                                <div class="stat-label">Dnes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="changesetsWeek">0</div>
+                                <div class="stat-label">Tento týden</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="changesetsChart"></canvas>
+                        </div>
+                        
+                        <div class="leaderboard">
+                            <h3><i class="fas fa-trophy"></i> Žebříček přispěvatelů</h3>
+                            <div id="leaderboardContainer">
+                                <!-- Leaderboard bude načten pomocí JavaScriptu -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="column">
+                <section id="chat" class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-comments"></i> Chat komunity</h2>
+                        <div class="online-count">Online: <span id="onlineCount">1</span></div>
+                    </div>
+                    <div class="card-body chat-container">
+                        <div id="messagesContainer" class="messages">
+                            <!-- Zprávy budou načteny pomocí Socket.io -->
+                        </div>
+                        
+                        <div class="chat-input-area">
+                            <div class="form-group">
+                                <input type="text" id="usernameInput" placeholder="Vaše přezdívka" value="">
+                            </div>
+                            <div class="form-group message-input-group">
+                                <input type="text" id="messageInput" placeholder="Napište zprávu...">
+                                <button id="sendMessageBtn" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="info" class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-info-circle"></i> Informace & Návody</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-section">
+                            <h3><i class="fas fa-map-signs"></i> Jak se zapojit?</h3>
+                            <ol class="info-list">
+                                <li>Hlasujte v anketě pro nápad na příští měsíc</li>
+                                <li>Po vyhlášení vítěze mapujte danou tematiku kdekoliv v ČR</li>
+                                <li>Při ukládání změn přidejte tag <code>#projektmesice</code> do políčka "Komentář" nebo "Zdroj"</li>
+                                <li>Sledujte statistiky a diskutujte v chatu</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3><i class="fas fa-link"></i> Užitečné odkazy</h3>
+                            <div class="links-grid">
+                                <a href="https://www.openstreetmap.org" target="_blank" class="link-card">
+                                    <i class="fas fa-globe-europe"></i>
+                                    <span>OpenStreetMap</span>
+                                </a>
+                                <a href="https://openstreetmap.cz/#map=15/49.7632/13.4308&layers=cAKCZ" target="_blank" class="link-card">
+                                    <i class="fas fa-users"></i>
+                                    <span>Česká komunita</span>
+                                </a>
+                                <a href="https://wiki.openstreetmap.org/wiki/Czech_community" target="_blank" class="link-card">
+                                    <i class="fas fa-book"></i>
+                                    <span>Wiki OSM CZ</span>
+                                </a>
+                                <a href="https://learnosm.org" target="_blank" class="link-card">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Návody (LearnOSM)</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3><i class="fas fa-calendar-alt"></i> Harmonogram</h3>
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Do 5.1.2026</div>
+                                    <div class="timeline-content">Hlasování o projektu</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-date">6.1.2026</div>
+                                    <div class="timeline-content">Vyhlášení vítězného projektu</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-date">6.1.2026 - 6.2.2026</div>
+                                    <div class="timeline-content">Mapování vybrané tematiky</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-date">7.2.2026</div>
+                                    <div class="timeline-content">Zveřejnění statistik a nové hlasování</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <div>
+                        <span>Projekt měsíce</span>
+                        <small>Česká OSM komunita</small>
+                    </div>
+                </div>
+                <div class="footer-info">
+                    <p>Nepovinný komunitní projekt pro českou OpenStreetMap komunitu. 
+                    Tato aplikace není oficiálním produktem OSM Foundation.</p>
+                    <p class="footer-copyright">© 2025-2026 Česká OSM komunita | Aktuální čas: <span id="currentDateTime"></span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
