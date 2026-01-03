@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Produkční backend aplikace Projekt měsíce pro českou OSM komunitu
-S reálným propojením na OSM API pro sledování changesetů s tagem #projektmesice
+Produkční backend aplikace Projekt čtvrtletí pro českou OSM komunitu
+S reálným propojením na OSM API pro sledování changesetů s tagem #projektctvrtleti
 """
 
 import os
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Konfigurace aplikace
 app = Flask(__name__, static_folder='.')
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'produkce-osm-projekt-mesice-2026-tajny-klic')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'produkce-osm-projekt-ctvrtleti-2026-tajny-klic')
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
@@ -39,46 +39,332 @@ session.mount('https://', adapter)
 
 # Globální proměnné pro správu dat
 connected_users = 0
-chat_messages = []
-project_ideas = []
-user_votes = {}
+
+# Načtení výchozích dat (už jsme dostali od uživatele)
+provided_data = {
+    "chat_messages": [
+        {
+            "user": "turistka123",
+            "text": "Dokončila jsem mapování turistických rozcestníků v Krkonoších.",
+            "timestamp": "2025-12-31T22:08:59.008730"
+        },
+        {
+            "user": "turistka123",
+            "text": "Dokončila jsem mapování turistických rozcestníků v Krkonoších.",
+            "timestamp": "2025-12-31T22:11:12.000605"
+        },
+        {
+            "user": "mapomat",
+            "text": "Právě jsem zmapoval 5 nových cyklostezek v Praze!",
+            "timestamp": "2025-12-31T22:16:41.985738"
+        },
+        {
+            "user": "Thisík",
+            "text": "Testovací zpráva",
+            "timestamp": "2025-12-31T22:20:08.569725"
+        },
+        {
+            "user": "MoudrýEditátor36",
+            "text": "Funguje?",
+            "timestamp": "2025-12-31T22:20:24.803822"
+        },
+        {
+            "user": "Thisík",
+            "text": "JJ",
+            "timestamp": "2025-12-31T22:20:32.631943"
+        },
+        {
+            "user": "Thisík",
+            "text": ":)",
+            "timestamp": "2025-12-31T22:24:30.429998"
+        },
+        {
+            "user": "RychlýEditátor11",
+            "text": "😉",
+            "timestamp": "2025-12-31T22:24:48.405515"
+        },
+        {
+            "user": "Ondřej Lopatka",
+            "text": "Zaprvé, tohle by se dalo napojit na náš OSM chat? Ale jestli to chcete nechat pro projekt měsíce tak asi jo.",
+            "timestamp": "2026-01-01T08:31:48.305618"
+        },
+        {
+            "user": "Ondřej Lopatka",
+            "text": "Zadruhé, ta village_green by podle mě šla docela dobře přemapovat pomocí nějakého hromadného editu z overpass hledání",
+            "timestamp": "2026-01-01T08:33:14.149370"
+        },
+        {
+            "user": "Ondřej Lopatka",
+            "text": "Ale určitě by to bylo vhodné, protože já jsem mapoval okolní zeleň právě jako village green, protože jsem tagy opisoval, místo abych četl wiki",
+            "timestamp": "2026-01-01T08:34:12.362743"
+        },
+        {
+            "user": "Thisík",
+            "text": "Přesně, ta village_green by šla krásně přes overpass a JOSM",
+            "timestamp": "2026-01-01T10:13:46.617609"
+        },
+        {
+            "user": "Thisík",
+            "text": "Napojit na OSM chat by to možná šlo, ale zatím bych to asi nechal takto, jestli souhlasíte.",
+            "timestamp": "2026-01-01T10:14:08.492441"
+        },
+        {
+            "user": "Ondřej Lopatka",
+            "text": "Udělal bych to tak, aby se mapovalo klidně od 1. každého měsíce až do posledního dne a aby se mezitím klidně celý měsíc hlasovalo o tématu na další měsíc, co myslíš?",
+            "timestamp": "2026-01-01T15:37:15.624698"
+        },
+        {
+            "user": "Thisík",
+            "text": "Ano, to je jasné, ale teď, jak jsem to vytvářel až v noci 31.12, tak jsem to udělal takto. Postupně samozřejmě najedeme na ten systém, jak říkáš Ty.",
+            "timestamp": "2026-01-01T19:31:24.419996"
+        },
+        {
+            "user": "Amunak",
+            "text": "Budu rád když se projdou staré poznámky, ale pozor na to, že fakt že je poznámka stará, ještě neznamená že je neaktuální. Nedávno mi takhle mermomocí zavíral \"starou\" poznámku jeden němec, ale poznámka byla o tom že se na to místo má jít někdo podívat a zkontrolovat to, ne zavírat to od počítače. Takže bych v první fázi prošel fakt jen to co se jednoznačně může vyhodit, nebo zapracovat poznámky o úpravách pokud to půjde, ale jinak je to o tom taky vyjít do terénu a ty věci začít zkoumat.",
+            "timestamp": "2026-01-02T14:28:37.619510"
+        },
+        {
+            "user": "Thisík",
+            "text": "Na dobíjecí stanice pro elektromobily přece budou nějaká opendata, ne?",
+            "timestamp": "2026-01-02T20:36:40.370224"
+        },
+        {
+            "user": "Ondřej Lopatka",
+            "text": "Já počítám s tím že vyřešení starých poznámek bude z velké části potřeba jít do terénu",
+            "timestamp": "2026-01-03T14:30:14.695442"
+        }
+    ],
+    "project_ideas": [
+        {
+            "id": 1767216366889,
+            "title": "Zařazování zastávek a stanic správně do IDSa opravovat staré tagy.",
+            "description": "Zařazování zastávek a stanic správně do IDS příslušných krajů a opravovat zastaralé/chybné tagy, kde chybí bus=yes a podobně. +mapování nových terminálu, který je teď docela dost.",
+            "author": "Thisík",
+            "votes": 5,
+            "created_at": "2025-12-31T22:26:06.889908",
+            "winning": False
+        },
+        {
+            "id": 1767218003305,
+            "title": "village_green není veřejná zeleň",
+            "description": "village_green je zatravněná náves v anglických vesnicích, ne veřejná zeleň. Pro tu je na místě tráva, křoví apod.",
+            "author": "PilnýKartograf65",
+            "votes": 3,
+            "created_at": "2025-12-31T22:53:23.305822",
+            "winning": False
+        },
+        {
+            "id": 1767218173150,
+            "title": "Uzavření starých poznámek",
+            "description": "V mapě jsou mnoho let staré poznámky, kterým se nikdo nevěnuje.",
+            "author": "PřesnýObjevitel0",
+            "votes": 25,
+            "created_at": "2025-12-31T22:56:13.150691",
+            "winning": True  # Vítězný nápad pro Q1 2026
+        },
+        {
+            "id": 1767279191529,
+            "title": "Mapování chodníků a přechodů pro chodce",
+            "description": "Doplnění chodníků a mapování chodníků podél silnic jako samostatných cest pro lepší přehlednost v mapě. Spousta chodníků je nezmapována, některé jsou pouze jako tag u samotné cesty, takže se nevykreslují. \nZároveň by se daly mapovat i přechody, které jsou často tagovány špatně místo značeného přechodu jako přechod.",
+            "author": "Ondřej Lopatka",
+            "votes": 8,
+            "created_at": "2026-01-01T15:53:11.529577",
+            "winning": False
+        },
+        {
+            "id": 1767287427772,
+            "title": "Dobíjecí stanice pro elektromobily",
+            "description": "V OSM chybí kvantum dobíjecích stanic pro elektromobily.",
+            "author": "NadšenýObjevitel78",
+            "votes": 7,
+            "created_at": "2026-01-01T18:10:27.772281",
+            "winning": False
+        },
+        {
+            "id": 1767294983190,
+            "title": "Revize a opravy nesprávně užívaných značek",
+            "description": "Provést kontrolu dat z pohledu správnosti užitých atributů. Uživatel Ernout Meillet opakovaně upozorňoval českou komunitu OSM na nesprávně užívané značky. Viz samostatná vlákna talk cz osm od strpna 2025.",
+            "author": "PřesnýEditátor72",
+            "votes": 3,
+            "created_at": "2026-01-01T20:16:23.190919",
+            "winning": False
+        },
+        {
+            "id": 1767349871457,
+            "title": "Povrchy dálnic a silnic první třídy",
+            "description": "Chybí nám jak větší části dálnic tak i spousta silnic první třídy. Neměl by být problém mapovat to i z ortofota (a teda hlavně by to všechno měl být asfalt).",
+            "author": "ZkušenýEditátor24",
+            "votes": 1,
+            "created_at": "2026-01-02T11:31:11.457919",
+            "winning": False
+        }
+    ],
+    "user_votes": {
+        "user_sl4oamv6b_mjuit45o": [
+            "1767216366889",
+            "1767218173150"
+        ],
+        "user_p9q73k9li_mjujrctg": [
+            1767218003305,
+            1767218173150
+        ],
+        "user_16kytczud_mjvjk7nj": [
+            1767279191529
+        ],
+        "user_2fqvtu6gc_mjvkyjuc": [
+            "1767279191529",
+            "1767218173150"
+        ],
+        "user_tvupej30s_mjvlxl37": [
+            "1767218003305"
+        ],
+        "user_bbou34s6p_mjvohnhx": [
+            "1767218173150"
+        ],
+        "user_m0u3c7y50_mjvp7i5p": [
+            "1767218173150",
+            1767287427772
+        ],
+        "user_hdsoii2dh_mjvptvwu": [
+            "1767218173150"
+        ],
+        "user_auowvjj5x_mjvqnc8w": [
+            "1767216366889"
+        ],
+        "user_b856oeail_mjvtjb1y": [
+            "1767218173150",
+            1767294983190
+        ],
+        "user_a99xzkvgq_mjvt9dkz": [
+            "1767218173150",
+            "1767279191529"
+        ],
+        "user_n5jti3vwl_mjvv8t2m": [
+            "1767287427772"
+        ],
+        "user_agwazkv9c_mjvx4jsv": [
+            "1767218173150",
+            "1767279191529"
+        ],
+        "user_54y01wp5h_mjvx8fj1": [
+            "1767279191529"
+        ],
+        "user_n71eg01m7_mjvxcp7z": [
+            "1767218173150"
+        ],
+        "user_oat4iepb8_mjvym1o5": [
+            "1767279191529"
+        ],
+        "user_6dgkzfzty_mjw1p316": [
+            "1767218173150",
+            "1767279191529"
+        ],
+        "user_o23s3gfcn_mjulxld0": [
+            "1767218173150"
+        ],
+        "user_ndx7qyxuc_mjvdpurr": [
+            "1767218173150",
+            "1767216366889"
+        ],
+        "user_cagtkicf9_mjw48cbb": [
+            "1767218173150",
+            "1767218003305"
+        ],
+        "user_z6dg03phu_mjwbs4rl": [
+            "1767218173150",
+            "1767287427772"
+        ],
+        "user_jkbmboxp5_mjwkra5j": [
+            "1767216366889",
+            "1767218173150"
+        ],
+        "user_3d9ise6n4_mjwlpano": [
+            "1767279191529",
+            "1767218173150"
+        ],
+        "user_pwbbpeu1l_mjwmiwnn": [
+            "1767218173150"
+        ],
+        "user_q482ua9gg_mjwqf1y0": [
+            1767349871457,
+            "1767294983190"
+        ],
+        "user_79laizviw_mjwvcinz": [
+            "1767218173150"
+        ],
+        "user_0oqw59ga4_mjww3rb0": [
+            "1767218173150",
+            "1767287427772"
+        ],
+        "user_uzfjkxns5_mjwwqpyn": [
+            "1767218173150",
+            "1767287427772"
+        ],
+        "user_ndtkaua1z_mjwxsgea": [
+            "1767218173150",
+            "1767294983190"
+        ],
+        "user_tp3wzzp1h_mjvssvh3": [
+            "1767216366889",
+            "1767218173150"
+        ],
+        "user_vgsagrywn_mjx2xw4n": [
+            "1767218173150",
+            "1767287427772"
+        ],
+        "user_vc56xvoxb_mjx34gb1": [
+            "1767218173150"
+        ],
+        "user_h6pil8gh9_mjxaoe2p": [
+            "1767287427772"
+        ]
+    }
+}
+
+# Inicializace globálních proměnných s poskytnutými daty
+chat_messages = provided_data['chat_messages']
+project_ideas = provided_data['project_ideas']
+user_votes = provided_data['user_votes']
 osm_stats_cache = {
     'data': None,
     'last_updated': None,
     'expires_at': None
 }
-current_project = None
+
+# Aktuální projekt - vítězný nápad pro Q1 2026
+current_project = {
+    'id': 1767218173150,
+    'title': 'Uzavření starých poznámek',
+    'description': 'V mapě jsou mnoho let staré poznámky, kterým se nikdo nevěnuje.',
+    'start_date': '2026-01-03',
+    'end_date': '2026-04-01',
+    'author': 'PřesnýObjevitel0',
+    'votes': 25,
+    'quarter': 'Q1-2026'
+}
 
 # Cesta k souboru s daty
-DATA_FILE = 'osm_project_data.json'
-CONFIG_FILE = 'osm_project_config.json'
+DATA_FILE = 'osm_project_data_quarterly.json'
+CONFIG_FILE = 'osm_project_config_quarterly.json'
 
-# Načtení dat ze souboru
+# Načtení dat ze souboru (pokud existuje)
 def load_data():
-    global chat_messages, project_ideas, user_votes, current_project
+    global chat_messages, project_ideas, user_votes
     try:
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            chat_messages = data.get('chat_messages', [])
-            project_ideas = data.get('project_ideas', [])
-            user_votes = data.get('user_votes', {})
-            logger.info(f"Data načtena: {len(chat_messages)} zpráv, {len(project_ideas)} nápadů")
+            chat_messages = data.get('chat_messages', provided_data['chat_messages'])
+            project_ideas = data.get('project_ideas', provided_data['project_ideas'])
+            user_votes = data.get('user_votes', provided_data['user_votes'])
+            logger.info(f"Data načtena ze souboru: {len(chat_messages)} zpráv, {len(project_ideas)} nápadů")
     except FileNotFoundError:
-        logger.info("Soubor s daty neexistuje, vytvářím nový...")
+        logger.info("Soubor s daty neexistuje, používám výchozí data...")
         save_data()
-    
-    try:
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-            current_project = config.get('current_project')
-    except FileNotFoundError:
-        logger.info("Konfigurační soubor neexistuje, vytvářím nový...")
-        save_config()
 
 # Uložení dat do souboru
 def save_data():
     data = {
-        'chat_messages': chat_messages[-200:],  # Ukládáme pouze posledních 200 zpráv
+        'chat_messages': chat_messages[-200:],
         'project_ideas': project_ideas,
         'user_votes': user_votes,
         'last_updated': datetime.now().isoformat()
@@ -90,26 +376,14 @@ def save_data():
     except Exception as e:
         logger.error(f"Chyba při ukládání dat: {e}")
 
-def save_config():
-    config = {
-        'current_project': current_project,
-        'last_updated': datetime.now().isoformat()
-    }
-    try:
-        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-            json.dump(config, f, ensure_ascii=False, indent=2)
-        logger.info("Konfigurace uložena")
-    except Exception as e:
-        logger.error(f"Chyba při ukládání konfigurace: {e}")
-
-# OSM API funkce pro získání changesetů s tagem #projektmesice
+# OSM API funkce pro získání changesetů s tagem #projektctvrtleti
 def fetch_changesets_from_osm():
-    """Získává changesety s tagem #projektmesice z OSM API - SPRÁVNÁ VERZE"""
+    """Získává changesety s tagem #projektctvrtleti z OSM API"""
     try:
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=30)
+        start_date = end_date - timedelta(days=90)  # Čtvrtletí = 90 dní
         
-        logger.info(f"OSM API dotaz: od {start_date.date()} do {end_date.date()}")
+        logger.info(f"OSM API dotaz pro čtvrtletí: od {start_date.date()} do {end_date.date()}")
         
         url = "https://api.openstreetmap.org/api/0.6/changesets"
         
@@ -120,7 +394,7 @@ def fetch_changesets_from_osm():
         }
         
         headers = {
-            'User-Agent': 'OSM-Projekt-Mesice/1.0 (Czech OSM Community; https://openstreetmap.cz)'
+            'User-Agent': 'OSM-Projekt-Ctvrtleti/1.0 (Czech OSM Community; https://openstreetmap.cz)'
         }
         
         response = session.get(url, params=params, headers=headers, timeout=60)
@@ -149,14 +423,14 @@ def fetch_changesets_from_osm():
                     if k and v:
                         tags[k] = v
                 
-                # HLAVNÍ ZMĚNA: Hledáme #projektmesice v tagu 'hashtags', ne 'comment'!
+                # Hledáme #projektctvrtleti v tagu 'hashtags'
                 hashtags = tags.get('hashtags', '')
                 comment = tags.get('comment', '')
                 
-                # Hledáme v hashtags i comment (pro jistotu)
+                # Hledáme v hashtags i comment
                 search_text = f"{hashtags} {comment}".lower()
                 
-                if '#projektmesice' in search_text:
+                if '#projektctvrtleti' in search_text or '#projektčtvrtletí' in search_text:
                     changeset_data = {
                         'id': changeset.get('id'),
                         'user': changeset.get('user'),
@@ -173,7 +447,7 @@ def fetch_changesets_from_osm():
                 logger.warning(f"Chyba při parsování changesetu: {e}")
                 continue
         
-        logger.info(f"Načteno {len(changesets)} changesetů s #projektmesice")
+        logger.info(f"Načteno {len(changesets)} changesetů s #projektctvrtleti")
         
         # Debug výpis
         for cs in changesets[:5]:
@@ -184,92 +458,6 @@ def fetch_changesets_from_osm():
     except Exception as e:
         logger.error(f"Chyba při získávání changesetů z OSM: {e}", exc_info=True)
         return []
-
-def fetch_from_overpass_api(start_date, end_date):
-    """Fallback metoda pomocí Overpass API - opravená pro hashtags"""
-    try:
-        # Formát data pro Overpass
-        start_str = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
-        end_str = end_date.strftime('%Y-%m-%dT%H:%M:%SZ')
-        
-        # Overpass API query - hledáme změny s hashtags obsahující #projektmesice
-        query = f"""
-        [out:json][timeout:90];
-        (
-          node["hashtags"~"#projektmesice"](changed:"{start_str}","{end_str}");
-          way["hashtags"~"#projektmesice"](changed:"{start_str}","{end_str}");
-          relation["hashtags"~"#projektmesice"](changed:"{start_str}","{end_str}");
-        );
-        out meta;
-        >;
-        out skel qt;
-        """
-        
-        url = "https://overpass-api.de/api/interpreter"
-        headers = {
-            'User-Agent': 'OSM-Projekt-Mesice/1.0 (Czech OSM Community)'
-        }
-        
-        response = session.post(url, data={'data': query}, headers=headers, timeout=120)
-        
-        if response.status_code != 200:
-            logger.error(f"Overpass API chyba: {response.status_code}")
-            return []
-        
-        data = response.json()
-        changesets_dict = {}
-        
-        for element in data.get('elements', []):
-            changeset_id = element.get('changeset')
-            if changeset_id:
-                if changeset_id not in changesets_dict:
-                    changesets_dict[changeset_id] = {
-                        'id': changeset_id,
-                        'user': element.get('user'),
-                        'uid': element.get('uid'),
-                        'created_at': element.get('timestamp') + 'Z' if element.get('timestamp') else None,
-                        'tags': element.get('tags', {})
-                    }
-        
-        changesets = list(changesets_dict.values())
-        logger.info(f"Overpass API našel {len(changesets)} changesetů")
-        return changesets
-        
-    except Exception as e:
-        logger.error(f"Chyba Overpass API: {e}")
-        return []
-
-def parse_changesets_old_method(xml_text):
-    """Starší metoda parsování jako fallback"""
-    changesets = []
-    lines = xml_text.split('\n')
-    current_changeset = None
-    in_changeset = False
-    
-    for line in lines:
-        line = line.strip()
-        if '<changeset' in line:
-            # Extract attributes
-            import re
-            attrs = re.findall(r'(\w+)="([^"]*)"', line)
-            current_changeset = dict(attrs)
-            current_changeset['tags'] = {}
-            in_changeset = True
-        elif '<tag' in line and in_changeset:
-            attrs = re.findall(r'(\w+)="([^"]*)"', line)
-            if attrs and len(attrs) >= 2:
-                current_changeset['tags'][attrs[0][1]] = attrs[1][1]
-        elif '</changeset>' in line and in_changeset:
-            if current_changeset:
-                # Check if comment contains #projektmesice (case insensitive)
-                comment = current_changeset.get('tags', {}).get('comment', '')
-                comment = comment + current_changeset.get('tags', {}).get('Comment', '')
-                if '#projektmesice' in comment.lower():
-                    changesets.append(current_changeset)
-            current_changeset = None
-            in_changeset = False
-    
-    return changesets
 
 def calculate_statistics(changesets):
     """Vypočítá statistiky ze changesetů"""
@@ -305,19 +493,18 @@ def calculate_statistics(changesets):
         if user:
             user_counts[user] = user_counts.get(user, 0) + 1
         
-        # Parse created_at - robustněji
+        # Parse created_at
         created_at = changeset.get('created_at')
         if created_at:
             try:
-                # OSM API vrací UTC čas, např.: 2026-01-01T10:30:00Z
-                # Odstranit 'Z' a převést na datetime
+                # OSM API vrací UTC čas
                 if created_at.endswith('Z'):
                     created_at = created_at[:-1] + '+00:00'
                 
                 created_dt = datetime.fromisoformat(created_at)
                 created_date = created_dt.date()
                 
-                # Today (s ohledem na timezone)
+                # Today
                 if created_date == today:
                     changesets_today += 1
                 
@@ -388,43 +575,53 @@ def periodic_tasks():
             # Ukládání dat každých 30 sekund
             save_data()
             
-            # Kontrola konce hlasování a vyhlášení vítěze
-            check_voting_period()
+            # Kontrola konce čtvrtletí
+            check_quarter_end()
             
         except Exception as e:
             logger.error(f"Chyba v periodických úlohách: {e}")
         
-        time.sleep(30)  # Spát 30 sekund
+        time.sleep(30)
 
-def check_voting_period():
-    """Kontrola, zda nekončí hlasování nebo projekt"""
+def check_quarter_end():
+    """Kontrola, zda nekončí čtvrtletí"""
     global current_project
     
     now = datetime.now()
     
-    # Pokud je 6.1.2026 00:00, vyhlásit vítěze
-    if now >= datetime(2026, 1, 6, 0, 0, 0) and current_project is None:
-        # Najít vítězný nápad
+    # Pokud je 2.4.2026 00:00, vyhlásit vítěze pro Q2
+    if now >= datetime(2026, 4, 2, 0, 0, 0):
+        # Najít vítězný nápad pro Q2
         if project_ideas:
-            winning_idea = max(project_ideas, key=lambda x: x.get('votes', 0))
-            current_project = {
-                'id': winning_idea['id'],
-                'title': winning_idea['title'],
-                'description': winning_idea['description'],
-                'start_date': '2026-01-06',
-                'end_date': '2026-02-06'
-            }
-            save_config()
-            
-            # Oznámit v chatu
-            system_message = {
-                'user': 'Systém',
-                'text': f'🎉 Vyhlášen vítězný projekt: "{winning_idea["title"]}"! Začínáme mapovat od dneška do 6.2.2026.',
-                'timestamp': now.isoformat()
-            }
-            chat_messages.append(system_message)
-            socketio.emit('chat_message', system_message)
-            logger.info(f"Vyhlášen vítězný projekt: {winning_idea['title']}")
+            # Vyfiltrujeme nápady, které nebyly vítězné
+            available_ideas = [idea for idea in project_ideas if not idea.get('winning', False)]
+            if available_ideas:
+                winning_idea = max(available_ideas, key=lambda x: x.get('votes', 0))
+                
+                # Označit jako vítězný
+                for idea in project_ideas:
+                    idea['winning'] = (idea['id'] == winning_idea['id'])
+                
+                current_project = {
+                    'id': winning_idea['id'],
+                    'title': winning_idea['title'],
+                    'description': winning_idea['description'],
+                    'start_date': '2026-04-02',
+                    'end_date': '2026-07-01',
+                    'author': winning_idea['author'],
+                    'votes': winning_idea['votes'],
+                    'quarter': 'Q2-2026'
+                }
+                
+                # Oznámit v chatu
+                system_message = {
+                    'user': 'Systém',
+                    'text': f'🎉 Vyhlášen vítězný projekt pro letní čtvrtletí 2026: "{winning_idea["title"]}"! Mapování probíhá od 2.4. do 1.7.2026.',
+                    'timestamp': now.isoformat()
+                }
+                chat_messages.append(system_message)
+                socketio.emit('chat_message', system_message)
+                logger.info(f"Vyhlášen vítězný projekt pro Q2: {winning_idea['title']}")
 
 # Flask routes
 @app.route('/')
@@ -457,6 +654,11 @@ def get_ideas():
     """API endpoint pro získání nápadů"""
     return jsonify(project_ideas)
 
+@app.route('/api/current-project')
+def get_current_project():
+    """API endpoint pro získání aktuálního projektu"""
+    return jsonify(current_project)
+
 @app.route('/api/vote', methods=['POST'])
 def vote_for_idea():
     """API endpoint pro hlasování pro nápad"""
@@ -485,10 +687,10 @@ def vote_for_idea():
         if user_id in user_votes and idea_id in user_votes[user_id]:
             return jsonify({'error': 'Už jste hlasovali pro tento nápad'}), 400
         
-        # Kontrola počtu hlasů (max 2 na období)
+        # Kontrola počtu hlasů (max 2 na čtvrtletí)
         user_vote_count = len(user_votes.get(user_id, []))
         if user_vote_count >= 2:
-            return jsonify({'error': 'Již jste použili všechny hlasy pro toto období'}), 400
+            return jsonify({'error': 'Již jste použili všechny hlasy pro toto čtvrtletí'}), 400
         
         # Přidat hlas
         idea['votes'] = idea.get('votes', 0) + 1
@@ -550,61 +752,6 @@ def add_idea():
         logger.error(f"Chyba při přidávání nápadu: {e}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/current-project')
-def get_current_project():
-    """API endpoint pro získání aktuálního projektu"""
-    return jsonify(current_project or {})
-
-@app.route('/api/debug/osm-test')
-def debug_osm_test():
-    """Debug endpoint pro testování OSM API s hashtags"""
-    import requests
-    
-    # Testovací dotaz - stejný jako v aplikaci
-    test_url = "https://api.openstreetmap.org/api/0.6/changesets"
-    params = {
-        'bbox': '12.09,48.55,18.87,51.06',
-        'time': '2025-12-01,2026-01-01',
-    }
-    
-    response = requests.get(test_url, params=params, timeout=30, 
-                           headers={'User-Agent': 'OSM-Projekt-Mesice-Debug'})
-    
-    # Analyzujeme response
-    import xml.etree.ElementTree as ET
-    changesets_with_hashtags = []
-    
-    if response.status_code == 200:
-        try:
-            root = ET.fromstring(response.text)
-            for changeset in root.findall('changeset'):
-                tags = {}
-                for tag in changeset.findall('tag'):
-                    k = tag.get('k')
-                    v = tag.get('v')
-                    if k and v:
-                        tags[k] = v
-                
-                if 'hashtags' in tags:
-                    changesets_with_hashtags.append({
-                        'id': changeset.get('id'),
-                        'user': changeset.get('user'),
-                        'hashtags': tags['hashtags'],
-                        'created_at': changeset.get('created_at')
-                    })
-        except Exception as e:
-            error = str(e)
-    else:
-        error = f"Status: {response.status_code}"
-    
-    return jsonify({
-        'url': response.url,
-        'status': response.status_code,
-        'size': len(response.text),
-        'changesets_with_hashtags': changesets_with_hashtags,
-        'preview': response.text[:500] if response.status_code == 200 else response.text
-    })
-    
 # Socket.IO events
 @socketio.on('connect')
 def handle_connect():
@@ -681,13 +828,13 @@ if __name__ == '__main__':
     update_osm_stats()
     
     print("=" * 70)
-    print("PRODUKČNÍ APLIKACE - Projekt měsíce pro českou OSM komunitu")
+    print("PRODUKČNÍ APLIKACE - Projekt čtvrtletí pro českou OSM komunitu")
     print(f"Čas spuštění: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}")
     print(f"Načteno: {len(chat_messages)} zpráv v chatu, {len(project_ideas)} nápadů")
-    print(f"Aktuální projekt: {current_project['title'] if current_project else 'Žádný (probíhá hlasování)'}")
+    print(f"Aktuální projekt (Q1 2026): {current_project['title']}")
+    print(f"Období: {current_project['start_date']} - {current_project['end_date']}")
     print("=" * 70)
     print("Aplikace běží na http://0.0.0.0:4040")
-    print("Pro produkci použijte gunicorn nebo uWSGI")
     print("Ukončete stiskem Ctrl+C")
     print("=" * 70)
     

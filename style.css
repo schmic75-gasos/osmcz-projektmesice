@@ -957,3 +957,66 @@ footer {
     margin-bottom: 15px;
     color: var(--light-gray);
 }
+
+
+.project-instructions {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.project-instructions h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: var(--primary-dark);
+}
+
+.instructions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .instructions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.instruction-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+
+.instruction-item i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-top: 3px;
+}
+
+.instruction-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--dark-color);
+}
+
+.instruction-item p {
+    color: var(--gray-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Styl pro časovou osu v harmonogramu */
+.timeline-item .timeline-date {
+    min-width: 80px;
+    text-align: center;
+    line-height: 1.2;
+}

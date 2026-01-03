@@ -115,16 +115,16 @@
       "title": "Uzavření starých poznámek",
       "description": "V mapě jsou mnoho let staré poznámky, kterým se nikdo nevěnuje.",
       "author": "PřesnýObjevitel0",
-      "votes": 25,
+      "votes": 26,
       "created_at": "2025-12-31T22:56:13.150691",
-      "winning": false
+      "winning": true
     },
     {
       "id": 1767279191529,
       "title": "Mapování chodníků a přechodů pro chodce",
       "description": "Doplnění chodníků a mapování chodníků podél silnic jako samostatných cest pro lepší přehlednost v mapě. Spousta chodníků je nezmapována, některé jsou pouze jako tag u samotné cesty, takže se nevykreslují. \nZároveň by se daly mapovat i přechody, které jsou často tagovány špatně místo značeného přechodu jako přechod.",
       "author": "Ondřej Lopatka",
-      "votes": 8,
+      "votes": 9,
       "created_at": "2026-01-01T15:53:11.529577",
       "winning": false
     },
@@ -274,7 +274,11 @@
     ],
     "user_h6pil8gh9_mjxaoe2p": [
       "1767287427772"
+    ],
+    "user_topxfrer1_mjygvjqv": [
+      "1767218173150",
+      "1767279191529"
     ]
   },
-  "last_updated": "2026-01-03T16:38:17.769751"
+  "last_updated": "2026-01-03T16:43:33.727315"
 }

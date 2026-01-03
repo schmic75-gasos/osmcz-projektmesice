@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekt měsíce - Česká OSM komunita</title>
+    <title>Projekt čtvrtletí - Česká OSM komunita</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
@@ -16,13 +16,14 @@
             <div class="logo">
                 <i class="fas fa-map-marked-alt"></i>
                 <div>
-                    <h1>Projekt měsíce</h1>
+                    <h1>Projekt čtvrtletí</h1>
                     <span class="subtitle">Česká OpenStreetMap komunita</span>
                 </div>
             </div>
             <nav>
                 <ul class="nav-menu">
-                    <li><a href="#anketa" class="nav-link active">Anketa</a></li>
+                    <li><a href="#aktualni-projekt" class="nav-link active">Aktuální projekt</a></li>
+                    <li><a href="#anketa" class="nav-link">Návrhy na příští</a></li>
                     <li><a href="#statistiky" class="nav-link">Statistiky</a></li>
                     <li><a href="#chat" class="nav-link">Chat</a></li>
                     <li><a href="#info" class="nav-link">Informace</a></li>
@@ -35,31 +36,62 @@
     </header>
 
     <main class="container">
-        <section id="current-project" class="card">
+        <section id="aktualni-projekt" class="card">
             <div class="card-header">
-                <h2><i class="fas fa-calendar-star"></i> Aktuální hlasování</h2>
+                <h2><i class="fas fa-calendar-star"></i> Aktuální projekt čtvrtletí</h2>
                 <div class="period-info">
-                    <span class="period-badge">Hlasování končí: 5.1.2026 23:59</span>
-                    <span class="period-badge">Projekt: 6.1.2026 - 6.2.2026</span>
+                    <span class="period-badge">JARNÍ ČTVRTLETÍ 2026</span>
+                    <span class="period-badge">3.1.2026 - 1.4.2026</span>
                 </div>
             </div>
             <div class="card-body">
                 <div class="project-info">
-                    <div class="no-project">
-                        <i class="fas fa-vote-yea"></i>
-                        <h3>Právě probíhá hlasování o projektu na leden 2026</h3>
-                        <p>Hlasujte pro nápad, co bychom měli společně mapovat v období od 6.1.2026 do 6.2.2026.</p>
-                        <p>Vítězný projekt bude vyhlášen 6.1.2026 v 00:00.</p>
+                    <div class="project-title">
+                        <h3>Uzavření starých poznámek</h3>
+                        <div class="votes-count">25 hlasů</div>
                     </div>
+                    <p class="project-description">
+                        V mapě jsou mnoho let staré poznámky, kterým se nikdo nevěnuje. Cílem tohoto projektu 
+                        je systematicky procházet a uzavírat staré poznámky, které již nejsou aktuální, 
+                        nebo je vyřešit a zapracovat do mapy.
+                    </p>
+                    
+                    <div class="project-instructions">
+                        <h4><i class="fas fa-graduation-cap"></i> Jak na to?</h4>
+                        <div class="instructions-grid">
+                            <div class="instruction-item">
+                                <i class="fas fa-search"></i>
+                                <div>
+                                    <strong>Hledání poznámek</strong>
+                                    <p>Použijte <a href="https://osmcha.org" target="_blank">OSMCha</a> nebo <a href="https://overpass-turbo.eu" target="_blank">Overpass Turbo</a> pro nalezení starých poznámek</p>
+                                </div>
+                            </div>
+                            <div class="instruction-item">
+                                <i class="fas fa-walking"></i>
+                                <div>
+                                    <strong>Terénní průzkum</strong>
+                                    <p>U starších poznámek je často potřeba vyjít do terénu a ověřit aktuálnost</p>
+                                </div>
+                            </div>
+                            <div class="instruction-item">
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Zpracování</strong>
+                                    <p>Poznámky buď uzavřete (pokud jsou neaktuální) nebo zapracujte do mapy</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="disclaimer">
                         <i class="fas fa-info-circle"></i>
-                        <p><strong>Upozornění:</strong> Projekt měsíce není rozkaz, ale komunitní cíl a doporučení. 
+                        <p><strong>Upozornění:</strong> Projekt čtvrtletí není rozkaz, ale komunitní cíl a doporučení. 
                         Zapojte se do mapování podle svých možností a preferencí.</p>
                     </div>
                     <div class="changeset-tag">
                         <h4><i class="fas fa-tag"></i> Povinný tag pro changeset:</h4>
-                        <code>#projektmesice</code>
-                        <p class="tag-info">Při mapování v rámci vybraného projektu přidejte tento tag k vašim changesetům.</p>
+                        <code>#projektctvrtleti</code>
+                        <p class="tag-info">Při mapování v rámci tohoto projektu přidejte tento tag k vašim changesetům.</p>
                     </div>
                 </div>
             </div>
@@ -69,7 +101,7 @@
             <div class="column">
                 <section id="anketa" class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-vote-yea"></i> Hlasování - Co budeme mapovat v lednu 2026?</h2>
+                        <h2><i class="fas fa-vote-yea"></i> Návrhy na letní čtvrtletí 2026</h2>
                         <div class="remaining-votes">Zbývající hlasy: <span id="remainingVotes">2</span></div>
                     </div>
                     <div class="card-body">
@@ -87,7 +119,7 @@
                         </div>
                         
                         <div class="ideas-list">
-                            <h3>Nápady na leden 2026</h3>
+                            <h3>Nápady na letní čtvrtletí (duben-červen 2026)</h3>
                             <div id="ideasContainer">
                                 <!-- Nápady budou načteny pomocí JavaScriptu -->
                             </div>
@@ -97,7 +129,7 @@
 
                 <section id="statistiky" class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-chart-bar"></i> Statistiky #projektmesice</h2>
+                        <h2><i class="fas fa-chart-bar"></i> Statistiky #projektctvrtleti</h2>
                         <div class="last-update">Aktualizováno: <span id="lastUpdate">právě teď</span></div>
                     </div>
                     <div class="card-body">
@@ -167,9 +199,9 @@
                         <div class="info-section">
                             <h3><i class="fas fa-map-signs"></i> Jak se zapojit?</h3>
                             <ol class="info-list">
-                                <li>Hlasujte v anketě pro nápad na příští měsíc</li>
-                                <li>Po vyhlášení vítěze mapujte danou tematiku kdekoliv v ČR</li>
-                                <li>Při ukládání změn přidejte tag <code>#projektmesice</code> do políčka "Komentář" nebo "Zdroj"</li>
+                                <li>Mapujte téma aktuálního čtvrtletí kdekoliv v ČR</li>
+                                <li>Při ukládání změn přidejte tag <code>#projektctvrtleti</code> do políčka "Komentář" nebo "Zdroj"</li>
+                                <li>Hlasujte pro nápady na příští čtvrtletí (max 2 hlasy)</li>
                                 <li>Sledujte statistiky a diskutujte v chatu</li>
                             </ol>
                         </div>
@@ -189,31 +221,43 @@
                                     <i class="fas fa-book"></i>
                                     <span>Wiki OSM CZ</span>
                                 </a>
-                                <a href="https://learnosm.org" target="_blank" class="link-card">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <span>Návody (LearnOSM)</span>
+                                <a href="https://github.com/schmic75-gasos/osmcz-projektmesice" target="_blank" class="link-card">
+                                    <i class="fa-brands fa-github"></i>
+                                    <span>GitHub projekut</span>
                                 </a>
                             </div>
                         </div>
                         
                         <div class="info-section">
-                            <h3><i class="fas fa-calendar-alt"></i> Harmonogram</h3>
+                            <h3><i class="fas fa-calendar-alt"></i> Harmonogram 2026</h3>
                             <div class="timeline">
                                 <div class="timeline-item">
-                                    <div class="timeline-date">Do 5.1.2026</div>
-                                    <div class="timeline-content">Hlasování o projektu</div>
+                                    <div class="timeline-date">JARNÍ<br>3.1. - 1.4.</div>
+                                    <div class="timeline-content">
+                                        <strong>Uzavření starých poznámek</strong>
+                                        <p>Probíhá mapování</p>
+                                    </div>
                                 </div>
                                 <div class="timeline-item">
-                                    <div class="timeline-date">6.1.2026</div>
-                                    <div class="timeline-content">Vyhlášení vítězného projektu</div>
+                                    <div class="timeline-date">LETNÍ<br>2.4. - 1.7.</div>
+                                    <div class="timeline-content">
+                                        <strong>Hlasování do 1.4.</strong>
+                                        <p>Připravujeme</p>
+                                    </div>
                                 </div>
                                 <div class="timeline-item">
-                                    <div class="timeline-date">6.1.2026 - 6.2.2026</div>
-                                    <div class="timeline-content">Mapování vybrané tematiky</div>
+                                    <div class="timeline-date">PODZIMNÍ<br>2.7. - 1.10.</div>
+                                    <div class="timeline-content">
+                                        <strong>Hlasování do 1.7.</strong>
+                                        <p>Připravujeme</p>
+                                    </div>
                                 </div>
                                 <div class="timeline-item">
-                                    <div class="timeline-date">7.2.2026</div>
-                                    <div class="timeline-content">Zveřejnění statistik a nové hlasování</div>
+                                    <div class="timeline-date">ZIMNÍ<br>2.10. - 31.12.</div>
+                                    <div class="timeline-content">
+                                        <strong>Hlasování do 1.10.</strong>
+                                        <p>Připravujeme</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +273,7 @@
                 <div class="footer-logo">
                     <i class="fas fa-map-marked-alt"></i>
                     <div>
-                        <span>Projekt měsíce</span>
+                        <span>Projekt čtvrtletí</span>
                         <small>Česká OSM komunita</small>
                     </div>
                 </div>

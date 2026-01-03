@@ -1,4 +1,4 @@
-// Produkční aplikace Projekt měsíce pro českou OSM komunitu
+// Produkční aplikace Projekt čtvrtletí pro českou OSM komunitu
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializace Socket.io - připojení k backendu
     const socket = io(window.location.origin, {
@@ -69,12 +69,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Anketa - Správa nápadů a hlasování
+    // Správa hlasování - maximálně 2 hlasy na čtvrtletí
     let userVotes = JSON.parse(localStorage.getItem('osmProjectVotes')) || { 
         ideas: {}, 
         remaining: 2,
-        userId: generateUserId()
+        userId: generateUserId(),
+        quarter: 'Q1-2026' // Aktuální čtvrtletí
     };
+    
+    // Pokud je nové čtvrtletí, resetovat hlasy
+    const currentQuarter = getCurrentQuarter();
+    if (userVotes.quarter !== currentQuarter) {
+        userVotes = {
+            ideas: {},
+            remaining: 2,
+            userId: userVotes.userId || generateUserId(),
+            quarter: currentQuarter
+        };
+    }
     
     const remainingVotesElement = document.getElementById('remainingVotes');
     const ideasContainer = document.getElementById('ideasContainer');
@@ -85,6 +97,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generování unikátního ID uživatele
     function generateUserId() {
         return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+    }
+    
+    // Získání aktuálního čtvrtletí
+    function getCurrentQuarter() {
+        const now = new Date();
+        const month = now.getMonth() + 1; // 1-12
+        const year = now.getFullYear();
+        
+        if (month >= 1 && month <= 3) return `Q1-${year}`;
+        if (month >= 4 && month <= 6) return `Q2-${year}`;
+        if (month >= 7 && month <= 9) return `Q3-${year}`;
+        return `Q4-${year}`;
     }
     
     // Aktualizace zbývajících hlasů
@@ -268,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Přidat nápad do seznamu
                 ideas.push(data.idea);
                 
-                // Automaticky hlasovat pro vlastní nápad
+                // Automaticky hlasovat pro vlastní nápad (pokud máme hlasy)
                 if (userVotes.remaining > 0) {
                     voteForIdea(data.idea.id);
                 }
@@ -314,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const chartData = {
             labels: labels,
             datasets: [{
-                label: 'Changesety s #projektmesice',
+                label: 'Changesety s #projektctvrtleti',
                 data: data,
                 backgroundColor: 'rgba(44, 120, 115, 0.2)',
                 borderColor: 'rgba(44, 120, 115, 1)',
@@ -516,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Připojeno k serveru');
         addMessage({
             user: 'Systém',
-            text: 'Připojeno k chatu komunity Projekt měsíce'
+            text: 'Vítejte v komunitním chatu Projekt čtvrtletí! Diskutujte o mapování, ptejte se na radu nebo sdílejte své úspěchy.'
         }, false, true);
     });
     
@@ -632,12 +656,4 @@ document.addEventListener('DOMContentLoaded', function() {
     loadIdeas();
     loadStats();
     updateRemainingVotes();
-    
-    // Přidat úvodní systémovou zprávu
-    setTimeout(() => {
-        addMessage({
-            user: 'Systém',
-            text: 'Vítejte v komunitním chatu Projekt měsíce! Zde můžete diskutovat o mapování, ptát se na radu nebo sdílet své úspěchy.'
-        }, false, true);
-    }, 1000);
 });
